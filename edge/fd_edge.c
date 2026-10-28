@@ -28,6 +28,13 @@ static void *alloc_take(Reader *r, size_t elem, size_t n) {
 
 static double now_s(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return t.tv_sec + 1e-9 * t.tv_nsec; }
 
+static float *transpose(const float *A, int rows, int cols) {
+    float *T = malloc(sizeof(float) * (size_t)rows * cols);
+    for (int r = 0; r < rows; r++)
+        for (int c = 0; c < cols; c++) T[(size_t)c * rows + r] = A[(size_t)r * cols + c];
+    return T;
+}
+
 FdModel *fd_model_from_memory(const unsigned char *data, size_t size, char *err, size_t errlen) {
     Reader r = {data, size, 1};
     char magic[4]; take(&r, magic, 4);
@@ -48,6 +55,8 @@ FdModel *fd_model_from_memory(const unsigned char *data, size_t size, char *err,
     m->Wi1 = alloc_take(&r, 4, (size_t)G * H); m->Wh1 = alloc_take(&r, 4, (size_t)G * H); m->b1 = alloc_take(&r, 4, G);
     m->Wo = alloc_take(&r, 4, (size_t)2 * H); m->bo = alloc_take(&r, 4, 2);
     if (!r.ok || r.left != 0) { snprintf(err, errlen, "model file size mismatch"); fd_model_free(m); return NULL; }
+    m->WiT0 = transpose(m->Wi0, G, nf); m->WhT0 = transpose(m->Wh0, G, H);
+    m->WiT1 = transpose(m->Wi1, G, H); m->WhT1 = transpose(m->Wh1, G, H);
     m->nb = m->nfft / 2 + 1;
     m->hann = malloc(sizeof(double) * m->win); m->hann_ss = 0;
     for (int n = 0; n < m->win; n++) { m->hann[n] = 0.5 - 0.5 * cos(2 * M_PI * n / m->win); m->hann_ss += m->hann[n] * m->hann[n]; }
@@ -75,6 +84,7 @@ void fd_model_free(FdModel *m) {
     if (!m) return;
     free(m->mu); free(m->sd); free(m->sos); free(m->zi); free(m->Wi0); free(m->Wh0); free(m->b0);
     free(m->Wi1); free(m->Wh1); free(m->b1); free(m->Wo); free(m->bo); free(m->hann); free(m->cosk); free(m->sink);
+    free(m->WiT0); free(m->WhT0); free(m->WiT1); free(m->WhT1);
     free(m);
 }
 
@@ -82,7 +92,9 @@ FdCtrl *fd_ctrl_new(const FdModel *m) {
     FdCtrl *c = calloc(1, sizeof(FdCtrl)); c->m = m;
     int H = m->H, G = 4 * H, T = m->n_past, nf = m->nf;
     c->z = calloc((size_t)m->nsos * 2 * FD_NAX, sizeof(double));
-    c->buf = calloc((size_t)T * nf, sizeof(float)); c->X = calloc((size_t)T * nf, sizeof(float));
+    c->buf = calloc((size_t)T * nf, sizeof(float)); c->proj = calloc((size_t)T * G, sizeof(float));
+    c->u = calloc(G, sizeof(float));
+    c->full = calloc((size_t)T * G, sizeof(float)); c->P2 = calloc((size_t)T * G, sizeof(float));
     c->Y1 = calloc((size_t)T * H, sizeof(float)); c->Y2 = calloc((size_t)T * H, sizeof(float));
     c->gates = calloc(G, sizeof(float)); c->h = calloc(H, sizeof(float)); c->c = calloc(H, sizeof(float));
     c->y = calloc((size_t)m->win * FD_NAX, sizeof(double)); c->col = calloc(m->win, sizeof(double));
@@ -94,7 +106,7 @@ void fd_ctrl_reset(FdCtrl *c) { c->started = 0; c->nbuf = 0; c->on = 0; }
 
 void fd_ctrl_free(FdCtrl *c) {
     if (!c) return;
-    free(c->z); free(c->buf); free(c->X); free(c->Y1); free(c->Y2); free(c->gates); free(c->h); free(c->c);
+    free(c->z); free(c->buf); free(c->proj); free(c->u); free(c->full); free(c->P2); free(c->Y1); free(c->Y2); free(c->gates); free(c->h); free(c->c);
     free(c->y); free(c->col); free(c->feat); free(c->sorted); free(c->P); free(c);
 }
 
@@ -167,17 +179,26 @@ void fd_features(FdCtrl *c, const double *y, double *f) {
 
 static inline float sigf(float x) { return 1.0f / (1.0f + expf(-x)); }
 
-static void lstm_layer(FdCtrl *c, const float *X, int nin, const float *Wi, const float *Wh, const float *b, float *Y) {
-    int H = c->m->H, G = 4 * H, T = c->m->n_past; float *h = c->h, *cc = c->c, *g = c->gates;
+static void project(const float *WT, int nin, int G, const float *x, const float *b, float *out) {
+    for (int r = 0; r < G; r++) out[r] = 0.0f;
+    for (int j = 0; j < nin; j++) {
+        const float xj = x[j]; const float *w = WT + (size_t)j * G;
+        for (int r = 0; r < G; r++) out[r] += w[r] * xj;
+    }
+    for (int r = 0; r < G; r++) out[r] += b[r];
+}
+
+static void recur(FdCtrl *c, const float *P, const float *WhT, float *Y) {
+    int H = c->m->H, G = 4 * H, T = c->m->n_past; float *h = c->h, *cc = c->c, *g = c->gates, *u = c->u;
     memset(h, 0, sizeof(float) * H); memset(cc, 0, sizeof(float) * H);
     for (int t = 0; t < T; t++) {
-        const float *x = X + (size_t)t * nin;
-        for (int r = 0; r < G; r++) {
-            float s = 0; const float *wi = Wi + (size_t)r * nin; for (int j = 0; j < nin; j++) s += wi[j] * x[j];
-            s += b[r];
-            float u = 0; const float *wh = Wh + (size_t)r * H; for (int j = 0; j < H; j++) u += wh[j] * h[j];
-            g[r] = s + u;
+        for (int r = 0; r < G; r++) u[r] = 0.0f;
+        for (int j = 0; j < H; j++) {
+            const float hj = h[j]; const float *w = WhT + (size_t)j * G;
+            for (int r = 0; r < G; r++) u[r] += w[r] * hj;
         }
+        const float *s = P + (size_t)t * G;
+        for (int r = 0; r < G; r++) g[r] = s[r] + u[r];
         for (int j = 0; j < H; j++) {
             float i = sigf(g[j]), f = sigf(g[H + j]), gg = tanhf(g[2 * H + j]), o = sigf(g[3 * H + j]);
             cc[j] = f * cc[j] + i * gg; h[j] = o * tanhf(cc[j]); Y[(size_t)t * H + j] = h[j];
@@ -207,20 +228,30 @@ double fd_ctrl_step(FdCtrl *c, const double *raw, double *st) {
         }
     double t1 = st ? now_s() : 0;
     fd_features(c, c->y, c->feat);
-    float *zrow;
-    if (c->nbuf == T) { memmove(c->buf, c->buf + nf, sizeof(float) * nf * (T - 1)); c->nbuf--; }
-    zrow = c->buf + (size_t)c->nbuf * nf;
+    int G = 4 * H;
+    if (c->nbuf == T) {
+        memmove(c->buf, c->buf + nf, sizeof(float) * nf * (T - 1));
+        memmove(c->proj, c->proj + G, sizeof(float) * G * (T - 1));
+        c->nbuf--;
+    }
+    float *zrow = c->buf + (size_t)c->nbuf * nf;
     for (int k = 0; k < nf; k++) {
         double v = isfinite(c->feat[k]) ? c->feat[k] : 0.0;
         v = (v - m->mu[k]) / m->sd[k]; if (v > 10) v = 10; if (v < -10) v = -10; zrow[k] = (float)v;
     }
+    project(m->WiT0, nf, G, zrow, m->b0, c->proj + (size_t)c->nbuf * G);
     c->nbuf++;
     double t2 = st ? now_s() : 0;
-    memset(c->X, 0, sizeof(float) * T * nf);
-    memcpy(c->X + (size_t)(T - c->nbuf) * nf, c->buf, sizeof(float) * nf * c->nbuf);
-    lstm_layer(c, c->X, nf, m->Wi0, m->Wh0, m->b0, c->Y1);
-    lstm_layer(c, c->Y1, H, m->Wi1, m->Wh1, m->b1, c->Y2);
-    float zo[2]; const float *hl = c->Y2 + (size_t)(T - 1) * H;
+    float *P1 = c->Y2;
+    int pad = T - c->nbuf;
+    float *full = c->full;
+    for (int t = 0; t < pad; t++) memcpy(full + (size_t)t * G, m->b0, sizeof(float) * G);
+    memcpy(full + (size_t)pad * G, c->proj, sizeof(float) * G * c->nbuf);
+    recur(c, full, m->WhT0, c->Y1);
+    float *P2 = c->P2;
+    for (int t = 0; t < T; t++) project(m->WiT1, H, G, c->Y1 + (size_t)t * H, m->b1, P2 + (size_t)t * G);
+    recur(c, P2, m->WhT1, P1);
+    float zo[2]; const float *hl = P1 + (size_t)(T - 1) * H;
     for (int r = 0; r < 2; r++) { float s = 0; for (int j = 0; j < H; j++) s += m->Wo[r * H + j] * hl[j]; zo[r] = s + m->bo[r]; }
     float mx = zo[0] > zo[1] ? zo[0] : zo[1]; float e0 = expf(zo[0] - mx), e1 = expf(zo[1] - mx);
     double p = (double)(e1 / (e0 + e1));

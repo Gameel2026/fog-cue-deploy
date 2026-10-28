@@ -11,12 +11,13 @@ typedef struct {
     double *mu, *sd, *sos, *zi;
     float *Wi0, *Wh0, *b0, *Wi1, *Wh1, *b1, *Wo, *bo;
     double *hann, hann_ss, *cosk, *sink;
+    float *WiT0, *WhT0, *WiT1, *WhT1;
 } FdModel;
 
 typedef struct {
     const FdModel *m;
     double *z;
-    float *buf, *X, *Y1, *Y2, *gates, *h, *c;
+    float *buf, *proj, *full, *P2, *Y1, *Y2, *gates, *u, *h, *c;
     double *y, *col, *feat, *sorted, *P;
     int started, nbuf, on;
 } FdCtrl;
