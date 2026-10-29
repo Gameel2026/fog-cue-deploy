@@ -1,0 +1,28 @@
+elapsed_ns,event
+90576547127230,start mode=energy minutes=30 model_sha256=5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912
+90576547312614,sensor name=LSM6DSV Accelerometer wake_up=false
+90576547350496,block_start idle
+91176689863648,block_start live
+91176738859863,sensor_on
+91186753268519,input rate=121.6038 path=resampled first_sample_after_ns=91186745286214
+91776752963224,sensor_off
+91776753390633,block_start idle
+92376888675635,block_start loop
+92976106992659,loop_decisions 966781
+92977064431299,block_start idle
+93577234968701,block_start live
+93577277960726,sensor_on
+93587302479042,input rate=121.6000 path=resampled first_sample_after_ns=93587296192887
+94177298283244,sensor_off
+94177301664063,block_start idle
+94777535728117,block_start loop
+95376762216284,loop_decisions 965329
+95377786474463,block_start idle
+95977804715113,block_start live
+95977855752426,sensor_on
+95987880045196,input rate=121.6032 path=resampled first_sample_after_ns=95987874523162
+96577869094312,sensor_off
+96577869661939,block_start idle
+97177944523926,block_start loop
+97777164733936,loop_decisions 965825
+97778204252247,finish Done. decisions=3537 loop_decisions=2897935

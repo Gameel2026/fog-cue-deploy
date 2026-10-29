@@ -1,0 +1,28 @@
+elapsed_ns,event
+104415191795523,start mode=energy minutes=30 model_sha256=5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912
+104415192086716,sensor name=ICM42605M Accelerometer wake_up=false
+104415192236562,block_start idle
+105015267606863,block_start live
+105015294876979,sensor_on
+105025311095241,input rate=100.0606 path=resampled first_sample_after_ns=105025305255136
+105615311094857,sensor_off
+105615312329665,block_start idle
+106215319760313,block_start loop
+106814781418846,loop_decisions 136084
+106815507878383,block_start idle
+107415604518185,block_start live
+107415624437993,sensor_on
+107425638082332,input rate=100.0826 path=resampled first_sample_after_ns=107425633737054
+108015637124602,sensor_off
+108015638572679,block_start idle
+108615706480173,block_start loop
+109215280016475,loop_decisions 135998
+109215957658782,block_start idle
+109816136512968,block_start live
+109816178567891,sensor_on
+109826194114884,input rate=100.0527 path=resampled first_sample_after_ns=109826189796404
+110416192408270,sensor_off
+110416193857039,block_start idle
+111016356610263,block_start loop
+111615608620219,loop_decisions 136254
+111616371740911,finish Done. decisions=3537 loop_decisions=408336
