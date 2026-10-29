@@ -1,0 +1,2 @@
+Linux localhost 4.14.113-27209611 #1 SMP PREEMPT Thu Apr 10 20:43:02 KST 2025 aarch64 Android
+13
