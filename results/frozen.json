@@ -1,0 +1,388 @@
+{
+  "candidate": "ctx32_w1",
+  "n_past": 32,
+  "cue_factor": 1.0,
+  "epochs": 1,
+  "thetas": {
+    "home": [
+      0.9,
+      0.1
+    ],
+    "lab": [
+      0.85,
+      0.1
+    ]
+  },
+  "rules": {
+    "home": "primary",
+    "lab": "primary"
+  },
+  "cv": {
+    "tdcsfog": {
+      "false_alarms_per_hour": 14.076950357834624,
+      "coverage_%": 59.009009009009006,
+      "timely_%": 8.88030888030888,
+      "cue_specificity": 0.7934384877691792,
+      "cue_sensitivity": 0.7160939139559287,
+      "cue_on_%": 41.85164640301181,
+      "episodes": 1110,
+      "eligible_episodes": 777,
+      "hours": 15.273194444444444,
+      "coverage_surrogate": 51.37648648648649,
+      "p_coverage": 0.0004997501249375312,
+      "timely_surrogate": 6.104182754182754,
+      "p_timely": 0.0009995002498750624,
+      "auc": 0.8175410930781652,
+      "context": "lab",
+      "theta_on": 0.85,
+      "theta_off": 0.1
+    },
+    "defog": {
+      "false_alarms_per_hour": 12.57574332585417,
+      "coverage_%": 40.5852417302799,
+      "timely_%": 7.379134860050891,
+      "cue_specificity": 0.9151235148496226,
+      "cue_sensitivity": 0.3940723102951313,
+      "cue_on_%": 11.802523210039098,
+      "episodes": 786,
+      "eligible_episodes": 393,
+      "hours": 20.674722222222222,
+      "coverage_surrogate": 39.467111959287536,
+      "p_coverage": 0.1729135432283858,
+      "timely_surrogate": 4.529516539440203,
+      "p_timely": 0.006496751624187906,
+      "auc": 0.733391865423385,
+      "context": "home",
+      "theta_on": 0.9,
+      "theta_off": 0.1
+    }
+  },
+  "candidates": [
+    {
+      "candidate": "ctx32_w1",
+      "n_past": 32,
+      "cue_factor": 1.0,
+      "median_best_epoch": 1.0,
+      "home_rule": "primary",
+      "home_theta_on": 0.9,
+      "home_theta_off": 0.1,
+      "defog_auc": 0.733391865423385,
+      "defog_false_alarms_per_hour": 12.57574332585417,
+      "defog_coverage_%": 40.5852417302799,
+      "defog_timely_%": 7.379134860050891,
+      "defog_cue_specificity": 0.9151235148496226,
+      "defog_cue_sensitivity": 0.3940723102951313,
+      "defog_cue_on_%": 11.802523210039098,
+      "lab_rule": "primary",
+      "lab_theta_on": 0.85,
+      "lab_theta_off": 0.1,
+      "tdcsfog_auc": 0.8175410930781652,
+      "tdcsfog_false_alarms_per_hour": 14.076950357834624,
+      "tdcsfog_coverage_%": 59.009009009009006,
+      "tdcsfog_timely_%": 8.88030888030888,
+      "tdcsfog_cue_specificity": 0.7934384877691792,
+      "tdcsfog_cue_sensitivity": 0.7160939139559287,
+      "tdcsfog_cue_on_%": 41.85164640301181,
+      "worst_rule": 0,
+      "worst_coverage_%": 40.5852417302799,
+      "mean_timely_%": 8.129721870179885,
+      "mean_false_alarms_per_hour": 13.326346841844398
+    },
+    {
+      "candidate": "ctx16_w1",
+      "n_past": 16,
+      "cue_factor": 1.0,
+      "median_best_epoch": 1.0,
+      "home_rule": "primary",
+      "home_theta_on": 0.95,
+      "home_theta_off": 0.1,
+      "defog_auc": 0.7328030555744373,
+      "defog_false_alarms_per_hour": 12.188797377366349,
+      "defog_coverage_%": 39.82188295165395,
+      "defog_timely_%": 3.5623409669211195,
+      "defog_cue_specificity": 0.9255750607604271,
+      "defog_cue_sensitivity": 0.3977066232220064,
+      "defog_cue_on_%": 10.908382485321582,
+      "lab_rule": "primary",
+      "lab_theta_on": 0.95,
+      "lab_theta_off": 0.1,
+      "tdcsfog_auc": 0.8324680792769567,
+      "tdcsfog_false_alarms_per_hour": 14.666218047232352,
+      "tdcsfog_coverage_%": 52.612612612612615,
+      "tdcsfog_timely_%": 6.177606177606178,
+      "tdcsfog_cue_specificity": 0.874032667424443,
+      "tdcsfog_cue_sensitivity": 0.6734653725078699,
+      "tdcsfog_cue_on_%": 35.37152054707322,
+      "worst_rule": 0,
+      "worst_coverage_%": 39.82188295165395,
+      "mean_timely_%": 4.869973572263649,
+      "mean_false_alarms_per_hour": 13.42750771229935
+    },
+    {
+      "candidate": "ctx16_w2",
+      "n_past": 16,
+      "cue_factor": 2.0,
+      "median_best_epoch": 2.0,
+      "home_rule": "primary",
+      "home_theta_on": 0.95,
+      "home_theta_off": 0.1,
+      "defog_auc": 0.7499592753930423,
+      "defog_false_alarms_per_hour": 11.076327775463865,
+      "defog_coverage_%": 37.150127226463106,
+      "defog_timely_%": 3.3078880407124682,
+      "defog_cue_specificity": 0.9053867974928329,
+      "defog_cue_sensitivity": 0.40171689955511,
+      "defog_cue_on_%": 12.75376533340499,
+      "lab_rule": "primary",
+      "lab_theta_on": 0.95,
+      "lab_theta_off": 0.1,
+      "tdcsfog_auc": 0.8498273295391798,
+      "tdcsfog_false_alarms_per_hour": 9.362808842652797,
+      "tdcsfog_coverage_%": 57.11711711711712,
+      "tdcsfog_timely_%": 5.405405405405405,
+      "tdcsfog_cue_specificity": 0.8325054886878532,
+      "tdcsfog_cue_sensitivity": 0.7213186428821267,
+      "tdcsfog_cue_on_%": 39.78739076268335,
+      "worst_rule": 0,
+      "worst_coverage_%": 37.150127226463106,
+      "mean_timely_%": 4.356646723058937,
+      "mean_false_alarms_per_hour": 10.219568309058332
+    },
+    {
+      "candidate": "ctx8_w1",
+      "n_past": 8,
+      "cue_factor": 1.0,
+      "median_best_epoch": 1.0,
+      "home_rule": "primary",
+      "home_theta_on": 0.95,
+      "home_theta_off": 0.1,
+      "defog_auc": 0.7785903095657181,
+      "defog_false_alarms_per_hour": 9.625280468634537,
+      "defog_coverage_%": 36.895674300254456,
+      "defog_timely_%": 2.035623409669211,
+      "defog_cue_specificity": 0.9161919954250972,
+      "defog_cue_sensitivity": 0.39419763143054076,
+      "defog_cue_on_%": 11.70847384755942,
+      "lab_rule": "primary",
+      "lab_theta_on": 0.9,
+      "lab_theta_off": 0.1,
+      "tdcsfog_auc": 0.8602492067075417,
+      "tdcsfog_false_alarms_per_hour": 12.374621477352298,
+      "tdcsfog_coverage_%": 57.47747747747748,
+      "tdcsfog_timely_%": 5.534105534105534,
+      "tdcsfog_cue_specificity": 0.8149261168117341,
+      "tdcsfog_cue_sensitivity": 0.7183237145855194,
+      "tdcsfog_cue_on_%": 40.68947957114407,
+      "worst_rule": 0,
+      "worst_coverage_%": 36.895674300254456,
+      "mean_timely_%": 3.7848644718873725,
+      "mean_false_alarms_per_hour": 10.999950972993418
+    },
+    {
+      "candidate": "ctx32_w2",
+      "n_past": 32,
+      "cue_factor": 2.0,
+      "median_best_epoch": 2.0,
+      "home_rule": "primary",
+      "home_theta_on": 0.95,
+      "home_theta_off": 0.1,
+      "defog_auc": 0.7305881278714689,
+      "defog_false_alarms_per_hour": 11.027959531902887,
+      "defog_coverage_%": 35.87786259541985,
+      "defog_timely_%": 3.5623409669211195,
+      "defog_cue_specificity": 0.9217526091242222,
+      "defog_cue_sensitivity": 0.38999937339432295,
+      "defog_cue_on_%": 11.167018232140698,
+      "lab_rule": "primary",
+      "lab_theta_on": 0.9,
+      "lab_theta_off": 0.1,
+      "tdcsfog_auc": 0.8340966933612642,
+      "tdcsfog_false_alarms_per_hour": 13.422208480726036,
+      "tdcsfog_coverage_%": 64.41441441441441,
+      "tdcsfog_timely_%": 10.424710424710424,
+      "tdcsfog_cue_specificity": 0.7454961618111892,
+      "tdcsfog_cue_sensitivity": 0.7589847848898216,
+      "tdcsfog_cue_on_%": 46.435748906490126,
+      "worst_rule": 0,
+      "worst_coverage_%": 35.87786259541985,
+      "mean_timely_%": 6.993525695815772,
+      "mean_false_alarms_per_hour": 12.22508400631446
+    },
+    {
+      "candidate": "ctx8_w2",
+      "n_past": 8,
+      "cue_factor": 2.0,
+      "median_best_epoch": 3.0,
+      "home_rule": "fallback_min_fa",
+      "home_theta_on": 0.95,
+      "home_theta_off": 0.1,
+      "defog_auc": 0.7762769295357721,
+      "defog_false_alarms_per_hour": 15.235996721707936,
+      "defog_coverage_%": 47.96437659033079,
+      "defog_timely_%": 4.580152671755725,
+      "defog_cue_specificity": 0.8873806424427573,
+      "defog_cue_sensitivity": 0.5317375775424525,
+      "defog_cue_on_%": 15.755283558827877,
+      "lab_rule": "primary",
+      "lab_theta_on": 0.95,
+      "lab_theta_off": 0.1,
+      "tdcsfog_auc": 0.8443508893858528,
+      "tdcsfog_false_alarms_per_hour": 13.1603117298826,
+      "tdcsfog_coverage_%": 61.8018018018018,
+      "tdcsfog_timely_%": 8.236808236808237,
+      "tdcsfog_cue_specificity": 0.8098344829733896,
+      "tdcsfog_cue_sensitivity": 0.7205535152151101,
+      "tdcsfog_cue_on_%": 41.079596606254604,
+      "worst_rule": 1,
+      "worst_coverage_%": 47.96437659033079,
+      "mean_timely_%": 6.408480454281981,
+      "mean_false_alarms_per_hour": 14.198154225795268
+    }
+  ],
+  "files": {
+    "model_fp32.npz": "cdfa93c1d9f6190bbf6097b570459ce1ef8c7aaee1437a3e1de4954209504116",
+    "model_int8.npz": "9cfe20861e287f3ba2aa635f9545aefe1c42cade756f98aeb14ff37f84357602",
+    "model_state.pt": "c1a5e7cc4abd87fcba158a085b06ec9586338eb0b4f1d5041b171b42db22a4cb",
+    "model_lab_fp32.npz": "1418e7810a9984583270de93244a2672b18cb90347d7104d28b5eb276b289e6a",
+    "model_lab_int8.npz": "4f993cc281868fa3e699a42351c5a4696d116de9f02a876ec82a3d279fb911b5",
+    "model_lab_state.pt": "62430d4636a64e6e62154a2ca8ab16999eb0ee422eb1097c208301e75ec439f8"
+  },
+  "config": {
+    "KAGGLE_ROOT": "D:\\New research fog work\\kaggle_fog\\Competition Dataset",
+    "FOGSTAR_CSV": "D:\\New research fog work\\FoG STAR\\sensor_data.csv",
+    "FOGSTAR_AXES": [
+      [
+        "back_acc_x",
+        1.0
+      ],
+      [
+        "back_acc_y",
+        1.0
+      ],
+      [
+        "back_acc_z",
+        1.0
+      ]
+    ],
+    "DAPHNET_ROOT": "D:\\Daphnet dataset\\dataset",
+    "DAPHNET_AXES": [
+      [
+        "tr_y",
+        -1.0
+      ],
+      [
+        "tr_z",
+        1.0
+      ],
+      [
+        "tr_x",
+        1.0
+      ]
+    ],
+    "MULTIMODAL_ROOT": "D:\\New research fog work\\Multimodal dataset 2021\\r8gmbtv7w2-3\\Filtered Data",
+    "MULTIMODAL_AXES": [
+      [
+        46,
+        -1.0
+      ],
+      [
+        47,
+        1.0
+      ],
+      [
+        48,
+        1.0
+      ]
+    ],
+    "MULTIMODAL_LSB_PER_G": 8192.0,
+    "PREP": "prepared",
+    "DATASETS": {
+      "tdcsfog": false,
+      "defog": false,
+      "Daphnet": false,
+      "Multimodal": false,
+      "FoG-STAR": true
+    },
+    "DEVELOPMENT": [
+      "tdcsfog",
+      "defog"
+    ],
+    "EXTERNAL": [
+      "Daphnet",
+      "Multimodal",
+      "FoG-STAR"
+    ],
+    "SELECTION_DATASET": "defog",
+    "CONTEXTS": {
+      "home": "defog",
+      "lab": "tdcsfog"
+    },
+    "CONTEXT_OF": {
+      "defog": "home",
+      "tdcsfog": "lab",
+      "Daphnet": "lab",
+      "Multimodal": "lab",
+      "FoG-STAR": "lab"
+    },
+    "OUT": "results",
+    "FS": 100,
+    "WIN": 50,
+    "NFFT": 256,
+    "MODE_RES": 0.01,
+    "FOG_MIN_SAMPLES": 30,
+    "PRE_W": 8,
+    "POST_W": 6,
+    "MERGE_GAP_S": 2.0,
+    "BAND": [
+      0.5,
+      20.0
+    ],
+    "FILT_ORDER": 4,
+    "G": 9.80665,
+    "SEED": 42,
+    "CANDIDATES": {
+      "ctx8_w1": [
+        8,
+        1.0
+      ],
+      "ctx8_w2": [
+        8,
+        2.0
+      ],
+      "ctx16_w1": [
+        16,
+        1.0
+      ],
+      "ctx16_w2": [
+        16,
+        2.0
+      ],
+      "ctx32_w1": [
+        32,
+        1.0
+      ],
+      "ctx32_w2": [
+        32,
+        2.0
+      ]
+    },
+    "N_FOLDS": 5,
+    "VAL_FRACTION": 0.2,
+    "MAX_EPOCHS": 12,
+    "PATIENCE": 3,
+    "BATCH": 256,
+    "FA_TARGET": 15.0,
+    "SPEC_FLOOR": 0.7,
+    "N_SHIFTS": 2000
+  },
+  "versions": {
+    "python": "3.8.5",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "numpy": "1.19.2",
+    "scipy": "1.5.2",
+    "pandas": "1.1.3",
+    "sklearn": "1.3.2",
+    "torch": "2.4.1+cpu"
+  },
+  "created": "2026-10-28 23:57:22"
+}

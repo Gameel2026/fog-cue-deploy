@@ -1,0 +1,11 @@
+{
+  "model.bin": "5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912",
+  "model_lab.bin": "088b2a27a11d9c3b8bb566333fa858026c90cdc5f352bab17feee1d27fe693d7",
+  "replay.bin": "68765978ba242bc779d07ae40d9d1cc7b0572b31796cd8e0b0da5f37c24cd6ba",
+  "replay_p.npy": "f0fe1e6bef4ef437271fac585bc08f7bbd5ea7e9f062457f5e13554e5efb7679",
+  "streams_Daphnet.bin": "0d63bb3f7eaaab20dc4543e54e770b4299e7025ae5bddc68e2b6787c03479386",
+  "streams_FoG-STAR.bin": "7867cbf673262d2234cc5d00d03e6c6d86bc2790cd6ed84d5f0de665c404a719",
+  "streams_Multimodal.bin": "453bbe4e0e58d123c62ea49deee2be62ed1e8837353d273ae959b215173a1928",
+  "streams_defog.bin": "cbab69cfd3ac886a71d7ab1b435bd628787118a27e207889a924d7eb5f280538",
+  "streams_models.txt": "699365f888ba1b256172be347358d1a65db6db5ec1116965f07b925d01a9e77a"
+}
