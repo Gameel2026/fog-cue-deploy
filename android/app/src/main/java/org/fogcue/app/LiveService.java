@@ -71,6 +71,8 @@ public class LiveService extends Service implements SensorEventListener {
     private String mode;
     private int minutes;
     private ToneGenerator tone;
+    private final List<long[]> schedule = new ArrayList<>();
+    private long endAt = Long.MAX_VALUE, blockEndAt = Long.MAX_VALUE;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -90,7 +92,8 @@ public class LiveService extends Service implements SensorEventListener {
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "fogcue:live");
         wakeLock.acquire(totalMs + 300_000L);
         sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-        acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER, true);
+        if (acc == null) acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         try {
             tone = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
         } catch (RuntimeException e) {
@@ -163,7 +166,7 @@ public class LiveService extends Service implements SensorEventListener {
             }
             raw = writer("raw.csv", "event_ns,arrival_ns,x,y,z,block");
             dec = writer("decisions.csv", "window,last_sample_ns,decision_ns,delay_ms,p,cue_on,processing_ms,block");
-            bat = writer("battery.csv", "elapsed_ns,current_ua,current_avg_ua,voltage_mv,level,screen_on,block");
+            bat = writer("battery.csv", "elapsed_ns,current_ua,current_avg_ua,charge_counter_uah,voltage_mv,level,plugged,status,screen_on,block");
             events = writer("events.csv", "elapsed_ns,event");
             if ("energy".equals(mode)) {
                 ByteBuffer bb = ByteBuffer.wrap(readAsset(getAssets().open("replay.bin"))).order(ByteOrder.LITTLE_ENDIAN);
@@ -175,6 +178,7 @@ public class LiveService extends Service implements SensorEventListener {
             }
             startWall = SystemClock.elapsedRealtime();
             event("start mode=" + mode + " minutes=" + minutes + " model_sha256=" + modelHash);
+            event("sensor name=" + acc.getName() + " wake_up=" + acc.isWakeUpSensor());
             handler.post(this::batteryTick);
             if ("energy".equals(mode)) {
                 nextBlock();
@@ -183,11 +187,11 @@ public class LiveService extends Service implements SensorEventListener {
                 startSensor();
                 for (int m : MOTION_MINUTES) {
                     if (m + 1 <= minutes) {
-                        handler.postDelayed(() -> motion(true), m * 60_000L);
-                        handler.postDelayed(() -> motion(false), (m + 1) * 60_000L);
+                        schedule.add(new long[]{startWall + m * 60_000L, 1});
+                        schedule.add(new long[]{startWall + (m + 1) * 60_000L, 0});
                     }
                 }
-                handler.postDelayed(() -> finish("Done."), minutes * 60_000L);
+                endAt = startWall + minutes * 60_000L;
             }
         } catch (IOException e) {
             finish("File error: " + e.getMessage());
@@ -244,7 +248,7 @@ public class LiveService extends Service implements SensorEventListener {
         event("block_start " + block);
         if ("live".equals(block)) startSensor();
         if ("loop".equals(block)) startLoop();
-        handler.postDelayed(this::nextBlock, BLOCK_S * 1000L);
+        blockEndAt = SystemClock.elapsedRealtime() + BLOCK_S * 1000L;
     }
 
     private void startLoop() {
@@ -274,14 +278,41 @@ public class LiveService extends Service implements SensorEventListener {
         }
     }
 
+    private void checkClock() {
+        long now = SystemClock.elapsedRealtime();
+        while (!schedule.isEmpty() && schedule.get(0)[0] <= now) {
+            motion(schedule.remove(0)[1] == 1);
+        }
+        if (now >= blockEndAt) {
+            blockEndAt = Long.MAX_VALUE;
+            nextBlock();
+        }
+        if (now >= endAt && bat != null) {
+            endAt = Long.MAX_VALUE;
+            finish("Done.");
+        }
+    }
+
+    private long lastBatteryRow = 0;
+
     private void batteryTick() {
+        checkClock();
         if (bat == null) return;
+        long nowMs = SystemClock.elapsedRealtime();
+        if (nowMs - lastBatteryRow < 1000) {
+            handler.postDelayed(this::batteryTick, 250);
+            return;
+        }
+        lastBatteryRow = nowMs;
         Intent b = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int mv = b != null ? b.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1) : -1;
         int lvl = b != null ? b.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : -1;
+        int plugged = b != null ? b.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) : -1;
+        int st = b != null ? b.getIntExtra(BatteryManager.EXTRA_STATUS, -1) : -1;
         try {
             bat.write(SystemClock.elapsedRealtimeNanos() + "," + bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) + ","
-                    + bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE) + "," + mv + "," + lvl + ","
+                    + bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE) + ","
+                    + bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER) + "," + mv + "," + lvl + "," + plugged + "," + st + ","
                     + (pm.isInteractive() ? 1 : 0) + "," + block + "\n");
             bat.flush();
             raw.flush();
@@ -292,7 +323,7 @@ public class LiveService extends Service implements SensorEventListener {
         status = String.format(Locale.US, "Mode: %s | block: %s | %d s elapsed\nInput: %s\nDecisions: %d | mean delay %.1f ms | max delay %.1f ms\nOutput: %s",
                 mode, block, el, proc == null ? "measuring sensor rate" : (proc.isResampling() ? "resampled to 100 Hz" : "native"),
                 decisions, decisions > 0 ? sumDelayMs / decisions : 0.0, maxDelayMs, dir.getAbsolutePath());
-        handler.postDelayed(this::batteryTick, 1000);
+        handler.postDelayed(this::batteryTick, 250);
     }
 
     @Override
@@ -316,6 +347,7 @@ public class LiveService extends Service implements SensorEventListener {
             return;
         }
         proc.sample(e.timestamp, e.values[0], e.values[1], e.values[2]);
+        checkClock();
     }
 
     private void onDecision(long w, long lastNs, long decNs, double p, boolean on, double procMs) {

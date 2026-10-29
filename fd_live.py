@@ -98,8 +98,14 @@ def energy(run_dir, capacity_mah):
     edges = list(starts["elapsed_ns"]) + [int(b["elapsed_ns"].max()) + 1]
     for i, (t0, e) in enumerate(zip(starts["elapsed_ns"], starts["event"])):
         g = b[(b["elapsed_ns"] >= t0 + 60_000_000_000) & (b["elapsed_ns"] < edges[i + 1])]
-        blocks.append({"block": i, "kind": e.split()[1], "seconds_used": len(g), "mean_ma": g["discharge_ma"].mean(),
-                       "sd_ma": g["discharge_ma"].std(), "mean_v": g["voltage_mv"].mean() / 1000.0, "screen_on_fraction": g["screen_on"].mean()})
+        row = {"block": i, "kind": e.split()[1], "seconds_used": len(g), "mean_ma": g["discharge_ma"].mean(),
+               "sd_ma": g["discharge_ma"].std(), "mean_v": g["voltage_mv"].mean() / 1000.0, "screen_on_fraction": g["screen_on"].mean()}
+        if "charge_counter_uah" in g and len(g) > 60:
+            t_h = (g["elapsed_ns"].to_numpy() - g["elapsed_ns"].iloc[0]) / 3.6e12
+            row["counter_ma"] = float(-np.polyfit(t_h, g["charge_counter_uah"].to_numpy(float), 1)[0] / 1000.0)
+        if "plugged" in g:
+            row["plugged_fraction"] = float((g["plugged"] > 0).mean())
+        blocks.append(row)
     bl = pd.DataFrame(blocks)
     out = {"blocks": bl.to_dict(orient="records")}
     pairs = {"live": [], "loop": []}
@@ -107,6 +113,13 @@ def energy(run_dir, capacity_mah):
         if bl.loc[i, "kind"] in pairs and bl.loc[i - 1, "kind"] == "idle":
             nxt = bl.loc[i + 1, "mean_ma"] if i + 1 < len(bl) and bl.loc[i + 1, "kind"] == "idle" else bl.loc[i - 1, "mean_ma"]
             pairs[bl.loc[i, "kind"]].append(bl.loc[i, "mean_ma"] - 0.5 * (bl.loc[i - 1, "mean_ma"] + nxt))
+    if "counter_ma" in bl:
+        cp = {"live": [], "loop": []}
+        for i in range(1, len(bl)):
+            if bl.loc[i, "kind"] in cp and bl.loc[i - 1, "kind"] == "idle":
+                nxt = bl.loc[i + 1, "counter_ma"] if i + 1 < len(bl) and bl.loc[i + 1, "kind"] == "idle" else bl.loc[i - 1, "counter_ma"]
+                cp[bl.loc[i, "kind"]].append(bl.loc[i, "counter_ma"] - 0.5 * (bl.loc[i - 1, "counter_ma"] + nxt))
+        out["charge_counter_check"] = {f"{k}_minus_idle_ma": float(np.mean(v)) for k, v in cp.items() if len(v)}
     for k, v in pairs.items():
         v = np.array(v)
         if len(v):
