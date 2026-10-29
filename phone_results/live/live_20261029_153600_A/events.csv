@@ -1,0 +1,19 @@
+elapsed_ns,event
+93881917245250,start mode=live minutes=60 model_sha256=5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912
+93881917456519,sensor name=ICM42605M Accelerometer wake_up=false
+93881920503596,sensor_on
+93891934111973,input rate=100.0819 path=resampled first_sample_after_ns=93891931902613
+94181923097150,motion_start
+94241917440684,motion_end
+94781926962298,motion_start
+94841925851486,motion_end
+95381922162484,motion_start
+95441918330057,motion_end
+95981923646901,motion_start
+96041922175512,motion_end
+96581926102357,motion_start
+96641924809776,motion_end
+97181923352005,motion_start
+97241926884039,motion_end
+97481934147944,sensor_off
+97481935228252,finish Done. decisions=7179 loop_decisions=0

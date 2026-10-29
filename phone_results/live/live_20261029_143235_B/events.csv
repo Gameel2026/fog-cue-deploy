@@ -1,0 +1,19 @@
+elapsed_ns,event
+76248132381952,start mode=live minutes=60 model_sha256=5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912
+76248132541946,sensor name=LSM6DSV Accelerometer wake_up=false
+76248140654495,sensor_on
+76258156946288,input rate=121.2638 path=resampled first_sample_after_ns=76258150353095
+76548135428567,motion_start
+76608138437914,motion_end
+77148138403022,motion_start
+77208139441991,motion_end
+77748134557774,motion_start
+77808133592268,motion_end
+78348135256553,motion_start
+78408135330395,motion_end
+78948138800019,motion_start
+79008139301553,motion_end
+79548138308653,motion_start
+79608136146125,motion_end
+79848153520063,sensor_off
+79848154422569,finish Done. decisions=7179 loop_decisions=0
