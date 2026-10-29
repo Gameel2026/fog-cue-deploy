@@ -8,7 +8,7 @@ mkdir -p "$OUT"
 cd "$HERE"
 
 build() {
-  clang -O2 -std=c11 -o fd_edge fd_edge.c fd_edge_cli.c -lm
+  clang -O2 -ffp-contract=off -std=c11 -o fd_edge fd_edge.c fd_edge_cli.c -lm
   sha256sum fd_edge.c fd_edge_cli.c fd_edge.h model*.bin replay.bin streams_*.bin > "$OUT/${DEV}_hashes.txt"
   uname -a > "$OUT/${DEV}_system.txt"
   getprop ro.build.version.release >> "$OUT/${DEV}_system.txt" 2>/dev/null || true

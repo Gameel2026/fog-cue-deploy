@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.22.1)
+project("fogcue" C)
+set(CMAKE_C_STANDARD 11)
+add_library(fogcue SHARED fd_edge.c fogcue_jni.c)
+target_compile_options(fogcue PRIVATE -O2 -ffp-contract=off)
+target_link_libraries(fogcue android log m)
