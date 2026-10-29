@@ -52,7 +52,9 @@ def resample_like_device(t, s, fs):
 
 def analyse(run_dir, npz):
     model = EdgeLSTM(npz)
-    raw = pd.read_csv(os.path.join(run_dir, "raw.csv"), dtype={"x": str, "y": str, "z": str})
+    raw_path = os.path.join(run_dir, "raw.csv")
+    raw_path = raw_path if os.path.exists(raw_path) else raw_path + ".gz"
+    raw = pd.read_csv(raw_path, dtype={"x": str, "y": str, "z": str})
     dec = pd.read_csv(os.path.join(run_dir, "decisions.csv"))
     segs, _ = segments(run_dir)
     rows, all_dec = [], []
@@ -87,12 +89,12 @@ def analyse(run_dir, npz):
     return pd.DataFrame(rows)
 
 
-def energy(run_dir, capacity_mah):
+def energy(run_dir, capacity_mah, current_unit="ua"):
     b = pd.read_csv(os.path.join(run_dir, "battery.csv"))
     ev = pd.read_csv(os.path.join(run_dir, "events.csv"))
     loops = [int(e.split()[1]) for e in ev["event"].astype(str) if e.startswith("loop_decisions")]
     sign = -1.0 if b.loc[b["block"] == "idle", "current_ua"].median() < 0 else 1.0
-    b["discharge_ma"] = sign * b["current_ua"] / 1000.0
+    b["discharge_ma"] = sign * b["current_ua"] / (1.0 if current_unit == "ma" else 1000.0)
     starts = ev[ev["event"].astype(str).str.startswith("block_start")]
     blocks = []
     edges = list(starts["elapsed_ns"]) + [int(b["elapsed_ns"].max()) + 1]
@@ -100,7 +102,7 @@ def energy(run_dir, capacity_mah):
         g = b[(b["elapsed_ns"] >= t0 + 60_000_000_000) & (b["elapsed_ns"] < edges[i + 1])]
         row = {"block": i, "kind": e.split()[1], "seconds_used": len(g), "mean_ma": g["discharge_ma"].mean(),
                "sd_ma": g["discharge_ma"].std(), "mean_v": g["voltage_mv"].mean() / 1000.0, "screen_on_fraction": g["screen_on"].mean()}
-        if "charge_counter_uah" in g and len(g) > 60:
+        if "charge_counter_uah" in g and len(g) > 60 and g["charge_counter_uah"].nunique() > 2:
             t_h = (g["elapsed_ns"].to_numpy() - g["elapsed_ns"].iloc[0]) / 3.6e12
             row["counter_ma"] = float(-np.polyfit(t_h, g["charge_counter_uah"].to_numpy(float), 1)[0] / 1000.0)
         if "plugged" in g:
@@ -113,7 +115,7 @@ def energy(run_dir, capacity_mah):
         if bl.loc[i, "kind"] in pairs and bl.loc[i - 1, "kind"] == "idle":
             nxt = bl.loc[i + 1, "mean_ma"] if i + 1 < len(bl) and bl.loc[i + 1, "kind"] == "idle" else bl.loc[i - 1, "mean_ma"]
             pairs[bl.loc[i, "kind"]].append(bl.loc[i, "mean_ma"] - 0.5 * (bl.loc[i - 1, "mean_ma"] + nxt))
-    if "counter_ma" in bl:
+    if "counter_ma" in bl and bl["counter_ma"].notna().all():
         cp = {"live": [], "loop": []}
         for i in range(1, len(bl)):
             if bl.loc[i, "kind"] in cp and bl.loc[i - 1, "kind"] == "idle":
@@ -145,7 +147,10 @@ C_BLOCK_S = 600
 
 def main():
     run_dir = sys.argv[1]
-    npz = sys.argv[2] if len(sys.argv) > 2 else os.path.join(C.OUT, "model_fp32.npz")
+    npz = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else os.path.join(C.OUT, "model_fp32.npz")
+    unit = sys.argv[sys.argv.index("--current-unit") + 1].lower() if "--current-unit" in sys.argv else "ua"
+    if unit not in ("ua", "ma"):
+        raise SystemExit("--current-unit must be ua or ma")
     res = analyse(run_dir, npz)
     res.to_csv(os.path.join(run_dir, "live_fidelity.csv"), index=False)
     for _, row in res.iterrows():
@@ -153,7 +158,8 @@ def main():
             print(f"{k:28s} {v}")
         print()
     if "--capacity" in sys.argv:
-        e = energy(run_dir, float(sys.argv[sys.argv.index("--capacity") + 1]))
+        e = energy(run_dir, float(sys.argv[sys.argv.index("--capacity") + 1]), unit)
+        e["current_unit"] = unit
         with open(os.path.join(run_dir, "energy.json"), "w") as f:
             json.dump(e, f, indent=2, default=float)
         print(json.dumps({k: v for k, v in e.items() if k != "blocks"}, indent=2, default=float))

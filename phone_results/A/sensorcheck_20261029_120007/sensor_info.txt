@@ -1,0 +1,16 @@
+manufacturer=samsung
+model=SM-P615
+sdk=33
+release=13
+sensor_name=ICM42605M Accelerometer
+vendor=TDK Invensense
+version=1
+min_delay_us=5000
+max_delay_us=160000
+fifo_reserved=0
+fifo_max=0
+resolution=0.0023942017
+max_range=78.4532
+power_mA=0.26
+wake_up=false
+battery_exempt=true
