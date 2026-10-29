@@ -1,0 +1,7 @@
+elapsed_ns,event
+364962819746947,start mode=live minutes=60 model_sha256=5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912
+364962829075177,sensor_on
+364972857092048,input rate=99.3911 path=resampled first_sample_after_ns=364972847881854
+368257670857895,motion_start
+368583333454953,motion_end
+368778338899983,stopped decisions=7610

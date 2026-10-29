@@ -1,0 +1,9 @@
+elapsed_ns,event
+371013463397870,start mode=live minutes=15 model_sha256=5b53630ce6047fed97cd7b7dd28c070d589823076b4b73ab28abc4a4922b3912
+371013463574433,sensor name=icm4x6xx Accelerometer Non-wakeup wake_up=false
+371013474519537,sensor_on
+371023499986773,input rate=99.3857 path=resampled first_sample_after_ns=371023492641257
+371333237166808,motion_start
+371595258113475,motion_end
+371951942500679,sensor_off
+371951942835106,finish Done. decisions=1180 loop_decisions=0
