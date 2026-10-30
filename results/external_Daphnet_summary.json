@@ -1,0 +1,26 @@
+{
+  "false_alarms_per_hour": 8.078541374474053,
+  "coverage_%": 74.15254237288136,
+  "timely_%": 3.6458333333333335,
+  "cue_specificity": 0.8016846109431783,
+  "cue_sensitivity": 0.7062993394554535,
+  "cue_on_%": 28.676016830294532,
+  "episodes": 236,
+  "eligible_episodes": 192,
+  "hours": 4.951388888888889,
+  "coverage_surrogate": 45.72097457627119,
+  "p_coverage": 0.0004997501249375312,
+  "timely_surrogate": 2.686979166666667,
+  "p_timely": 0.24687656171914044,
+  "auc": 0.8085071475906667,
+  "theta_on": 0.85,
+  "theta_off": 0.1,
+  "context": "lab",
+  "patients": 10,
+  "with_home_threshold": {
+    "false_alarms_per_hour": 6.4628330995792425,
+    "coverage_%": 69.91525423728814,
+    "timely_%": 5.208333333333333,
+    "cue_specificity": 0.8263084604150392
+  }
+}

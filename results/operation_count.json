@@ -1,0 +1,6 @@
+{
+  "lstm_macs": 2162816,
+  "dft_macs": 38700,
+  "filter_macs": 3000,
+  "total_macs": 2204516
+}
