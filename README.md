@@ -4,7 +4,7 @@ Decision fidelity of a freezing-of-gait cue controller from training to an Andro
 
 ## Requirements
 
-Python 3.10+ with the packages in `requirements.txt`. A C compiler (clang in Termux) for `edge/`. Android Studio for the application.
+Python 3.8 or later with the packages in `requirements.txt` (the results were produced with Python 3.8.5). A C compiler (clang in Termux) for `edge/`. Android Studio for the application.
 
 ## How to run
 
