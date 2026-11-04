@@ -1,4 +1,5 @@
 # fog-cue-deploy
+[![DOI](https://zenodo.org/badge/1437535749.svg)](https://doi.org/10.5281/zenodo.23791272)
 
 Decision fidelity of a freezing-of-gait cue controller from training to Android devices.
 
