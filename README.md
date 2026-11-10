@@ -50,11 +50,18 @@ Paths to the raw data are set in `fd_config.py`. `--quick` writes to `results_qu
 | `fd_stream_sender.py` | laptop side of the Wi-Fi streaming run |
 | `fd_summarize.py` | summary of Termux outputs |
 | `fd_live.py` | live sensor and energy runs from the Android application (`--capacity`, `--current-unit ua\|ma`) |
+| `fd_type_chance.py` | post hoc: FoG-STAR coverage by FoG type against circular-shift chance |
+| `fd_margins.py` | post hoc: distance of probabilities from the active threshold |
+| `fd_runtime.py` | post hoc: ONNX Runtime and TensorFlow Lite check (needs `onnx`, `onnxruntime`, `tensorflow`) |
+| `fd_tilt.py` | post hoc: sensor-tilt sensitivity on the external datasets |
+| `fd_patient_level.py` | post hoc: patient-level coverage, chance and false alarms |
+| `fd_tradeoff_figure.py` | coverage and false-alarm trade-off figure of the selected candidate |
 | `android/` | Android application source (Java and JNI) |
 | `results/` | frozen model record, cross-validation, external, precision, fault and fidelity results |
 | `results/edge/` | model, replay and hash files used on the devices |
 | `phone_results/` | outputs of all device runs; raw sample logs are gzip-compressed |
 | `figures/` | coverage and false-alarm trade-off of the selected candidate |
+The post hoc scripts were added after the planned analyses and were not pre-registered. They do not change the frozen model, thresholds or criteria. Run them from the repository root after the planned scripts, for example `python fd_patient_level.py`.
 
 ## Data
 
