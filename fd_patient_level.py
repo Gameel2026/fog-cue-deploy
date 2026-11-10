@@ -1,13 +1,3 @@
-"""Patient-level performance (added after the planned analyses; not pre-registered).
-
-For every patient of the five datasets the frozen cue decisions are evaluated separately:
-episode coverage, its circular-shift chance (2,000 shifts), timely activation and false alarms per hour.
-Development datasets use the out-of-fold predictions of the selected candidate with its frozen thresholds.
-External datasets use the logged decisions of the frozen model (results/external_*_windows.csv).
-
-Run from the repository root:  python fd_patient_level.py
-Outputs: results/patient_level.csv and results/patient_level_summary.csv
-"""
 import os
 import json
 import numpy as np
