@@ -1,0 +1,4 @@
+severity,episodes,coverage,chance,gain,p,median_dur_s
+shuffling,18,11.1,14.6,-3.5,0.935,2.5
+trembling,30,40.0,32.6,7.4,0.142,5.5
+akinesia,35,57.1,45.3,11.9,0.028,13.0
